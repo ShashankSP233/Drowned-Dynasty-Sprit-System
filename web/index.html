@@ -107,15 +107,29 @@
       </form>
 
       <aside class="right">
-        <section class="panel total-card">
-          <div>
-            <small>MANA REQUIRED</small>
-            <div id="total" class="big">0</div>
+        <section class="panel">
+          <div class="total-card">
+            <div>
+              <small>MANA REQUIRED</small>
+              <div id="total" class="big">0</div>
+            </div>
+            <button id="use-attack" type="button" disabled>Use Attack</button>
           </div>
-          <div class="pool">
-            <small>SPIRIT POOL</small>
-            <strong id="pool">15 / 15</strong>
+          <div class="resource-pools">
+            <div class="resource-pool">
+              <small>SPIRIT POINTS · LONG REST</small>
+              <strong id="spirit-pool">15 / 15</strong>
+            </div>
+            <div class="resource-pool">
+              <small>PROFICIENCY POINTS · EACH ROUND</small>
+              <strong id="proficiency-pool">3 / 3</strong>
+            </div>
           </div>
+          <div class="resource-actions">
+            <button id="start-round" type="button">Start Round</button>
+            <button id="long-rest" type="button">Long Rest</button>
+          </div>
+          <small class="resource-note">Attacks spend proficiency points first, then spirit points. Your pools are saved on this device.</small>
         </section>
 
         <section class="panel">

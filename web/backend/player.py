@@ -33,12 +33,14 @@ class Player:
         return reusable_mana_pool(self.proficiency)
 
     def can_use_spirit_attack(self, attack_cost: int) -> bool:
-        return 0 <= attack_cost <= self.spirit_mana
+        return 0 <= attack_cost <= self.spirit_mana + self.reusable_mana
 
     def use_spirit_attack(self, attack_cost: int):
         if not self.can_use_spirit_attack(attack_cost):
-            raise ValueError("Not enough spirit-form mana.")
-        self.spirit_mana -= attack_cost
+            raise ValueError("Not enough spirit or proficiency points.")
+        from_reusable = min(attack_cost, self.reusable_mana)
+        self.reusable_mana -= from_reusable
+        self.spirit_mana -= attack_cost - from_reusable
 
     def start_turn(self):
         self.reusable_mana = self.maximum_reusable_mana

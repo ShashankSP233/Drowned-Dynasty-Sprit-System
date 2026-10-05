@@ -4,9 +4,9 @@
 
 ## Architecture
 
-- `python/rules.py` — source-of-truth rules and costs
-- `python/attack.py` — attack construction and calculation
-- `python/player.py` — player resource model
+- `web/backend/rules.py` — source-of-truth rules and costs
+- `web/backend/attack.py` — attack construction and calculation
+- `web/backend/player.py` — player resource model
 - `web/index.html` — UI
 - `web/style.css` — styling
 - `web/app.js` — browser/Pyodide bridge
@@ -40,6 +40,8 @@ The initial implementation intentionally does not invent rules where the supplie
 The document states:
 - reusable mana = proficiency modifier, regained at the start of the turn
 - spirit-form mana = 3 × level
+- spirit points return on a long rest; proficiency points equal the proficiency modifier and return at the start of each round
+- attacks spend proficiency points first, then spirit points
 - Power = 1 point per 1d6, maximum dice equal to level
 - Distance = 30/60/120/300 ft costing 1/2/3/4
 - AoE cone = 2 per segment
