@@ -1,6 +1,6 @@
-from web.python.rules import power_cost, distance_cost, aoe_cost, embue_cost
-from web.python.attack import SpiritAttack
-from web.python.player import Player
+from web.backend.rules import power_cost, distance_cost, aoe_cost, embue_cost
+from web.backend.attack import SpiritAttack
+from web.backend.player import Player
 
 
 def test_power():
