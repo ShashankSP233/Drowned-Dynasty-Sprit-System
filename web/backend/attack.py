@@ -30,7 +30,7 @@ class SpiritAttack:
     # The source document contains "Unique feature 1=each".
     # This remains an explicit toggle, but its cost is configurable.
     element_feature: bool = False
-    element_feature_cost_value: int = 0
+    element_feature_cost_value: int = 1
 
     def validate(self):
         if self.element not in ELEMENTS:

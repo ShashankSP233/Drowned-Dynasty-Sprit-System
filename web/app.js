@@ -32,6 +32,7 @@ function clampPowerToLevel() {
   const level = Math.max(1, Number($("level").value) || 1);
   $("power").max = level;
   $("embue").max = level;
+  $("power-value").textContent = `${$("power").value}d6`;
   if (Number($("power").value) > level) $("power").value = level;
   if (Number($("embue").value) > level) $("embue").value = level;
 }
