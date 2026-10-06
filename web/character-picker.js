@@ -1,6 +1,7 @@
 (() => {
   const selectedKey = "spirit-attack-builder-character";
   const nameKey = "spirit-attack-builder-character-name";
+  const profilesKey = "spirit-attack-builder-profiles";
   const pageUrl = new URL(window.location.href);
   const dialog = document.getElementById("character-dialog");
   const choice = document.getElementById("character-choice");
@@ -15,6 +16,13 @@
     default_level: 4,
     default_element: "fire",
   }));
+  try {
+    const savedProfiles = JSON.parse(localStorage.getItem(profilesKey));
+    if (Array.isArray(savedProfiles) && savedProfiles.length)
+      profiles = savedProfiles;
+  } catch {
+    // The Python profiles will replace these defaults on the Attack Builder page.
+  }
   let chosenId = pageUrl.searchParams.get("character") || localStorage.getItem(selectedKey);
 
   function migrateLegacyData(id) {
@@ -58,6 +66,7 @@
 
   function setProfiles(nextProfiles) {
     profiles = nextProfiles;
+    localStorage.setItem(profilesKey, JSON.stringify(profiles));
     for (const profile of profiles)
       localStorage.setItem(`${nameKey}-${profile.id}`, profile.name);
     fillChoices();

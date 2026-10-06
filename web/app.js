@@ -129,11 +129,20 @@ function buildRoll20Macro(result, resolution) {
   else
     for (const ability of resolution.abilities)
       rows.push(`{{${ability} Save DC=${result.save_dc}}}`);
-  if (Number($("power").value) > 0)
-    rows.push(`{{Damage=[[${$("power").value}d6]]}}`);
+
+  const distance = Number($("distance").value);
+  rows.push(`{{Range=${distance ? `${distance} ft` : "Touch"}}}`);
+  if ($("aoe-enabled").checked)
+    rows.push(`{{Area of Effect=${$("aoe-shape").value}, ${$("aoe-size").value} ft}}`);
+
+  const powerDice = Number($("power").value);
+  if (powerDice > 0)
+    rows.push(`{{Damage (${element})=[[${powerDice}d6]]}}`);
+  else
+    rows.push(`{{Damage Type=${element}}}`);
   const effects = [...document.querySelectorAll(".rider:checked")]
     .map((input) => input.parentElement.textContent.trim().replace(/\s+\d+$/, ""));
-  if ($("element-feature").checked) effects.push(featureText[result.element]);
+  if ($("element-feature").checked) effects.push(`${element} Feature: ${featureText[result.element]}`);
   if (effects.length) rows.push(`{{Effects=${effects.join(", ")}}}`);
   return rows.join(" ");
 }

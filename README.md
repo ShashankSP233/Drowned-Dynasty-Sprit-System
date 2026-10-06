@@ -59,6 +59,7 @@ The document states:
 - Starter profiles Character 1–6 currently each have a +4 Spirit modifier, default level 4, and default element Fire; each profile can be edited independently in `web/backend/characters.py`
 - On first use, choose a character profile; its name stays in the top-right switcher, and each profile has separate point pools and Embue charges shared between the two pages on that browser
 - The attack preview generates a copyable Roll20 macro with an attack roll, save DC, selected damage dice, and selected effects
+- Each loaded Embue batch generates a copyable Roll20 macro with its per-hit bonus damage and any rider save DCs; it does not include an attack roll
 
 The exact effects of each element feature follow the selected element.
 

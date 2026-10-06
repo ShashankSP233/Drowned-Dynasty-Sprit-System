@@ -41,6 +41,22 @@ header {
   margin: 0 0 6px;
 }
 
+.brand-heading { position: relative; }
+.brand-logo {
+  position: absolute;
+  left: -90px;
+  top: 0;
+  width: 72px;
+  height: 72px;
+  max-width: 72px;
+  max-height: 72px;
+  object-fit: cover;
+  object-position: center;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+}
+
 h1 { margin: 0; font-size: clamp(30px, 5vw, 48px); }
 h2 { margin: 0 0 16px; font-size: 20px; }
 h3 { margin: 0 0 10px; font-size: 14px; }
@@ -311,6 +327,11 @@ footer {
   color: var(--muted);
   font-size: 12px;
   margin-top: 20px;
+}
+
+@media (max-width: 1212px) {
+  .brand-heading { display: flex; align-items: flex-start; gap: 12px; }
+  .brand-logo { position: static; width: 52px; height: 52px; max-width: 52px; max-height: 52px; flex: 0 0 52px; }
 }
 
 @media (max-width: 800px) {

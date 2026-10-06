@@ -8,6 +8,13 @@ const riderEffects = {
   constitution_incapacitate: { label: "Constitution — Incapacitate", cost: 10 },
   difficult_terrain: { label: "Difficult terrain — 1 minute", cost: 2 },
 };
+const riderSaveAbilities = {
+  dexterity_prone: "Dexterity",
+  strength_prone_knockback: "Strength",
+  constitution_blind: "Constitution",
+  strength_restrained: "Strength",
+  constitution_incapacitate: "Constitution",
+};
 
 const $ = (id) => document.getElementById(id);
 let resources;
@@ -166,13 +173,60 @@ function renderBatches() {
     for (const rider of batch.riders) descriptions.push(`${riderEffects[rider].label} on hit`);
     effects.textContent = descriptions.length ? descriptions.join(" · ") : "No effects selected";
 
+    const macro = document.createElement("textarea");
+    macro.rows = 4;
+    macro.readOnly = true;
+    macro.setAttribute("aria-label", `Roll20 macro for Embue batch ${batch.number}`);
+    macro.value = buildEmbueMacro(batch);
+
+    const copyMacro = document.createElement("button");
+    copyMacro.type = "button";
+    copyMacro.textContent = "Copy Roll20 Macro";
+    copyMacro.disabled = batch.remainingCharges < 1;
+    copyMacro.addEventListener("click", () => copyEmbueMacro(macro));
+
     const spend = document.createElement("button");
     spend.type = "button";
     spend.textContent = "Mark Hit · Spend 1 Charge";
     spend.disabled = batch.remainingCharges < 1;
     spend.addEventListener("click", () => spendCharge(batch.id));
-    card.append(top, effects, spend);
+    card.append(top, effects, macro, copyMacro, spend);
     container.append(card);
+  }
+}
+
+function buildEmbueMacro(batch) {
+  const profile = window.selectedCharacterProfile();
+  const characterName = String(batch.characterName || profile.name).replace(/[{}|]/g, "");
+  const element = String(batch.element || resources.element || profile.default_element || "fire");
+  const titleElement = element[0].toUpperCase() + element.slice(1);
+  const spiritModifier = Number(batch.spiritModifier ?? profile.spirit_modifier) || 0;
+  const proficiency = Number(batch.proficiency ?? resources.proficiency) || 0;
+  const saveDc = 8 + spiritModifier + proficiency;
+  const rows = [`&{template:default} {{name=${characterName} — ${titleElement} Embue}}`];
+
+  if (batch.powerDice > 0)
+    rows.push(`{{Damage (${titleElement})=[[${batch.powerDice}d6]]}}`);
+
+  const abilities = [...new Set((batch.riders || [])
+    .map((rider) => riderSaveAbilities[rider])
+    .filter(Boolean))];
+  for (const ability of abilities)
+    rows.push(`{{${ability} Save DC=${saveDc}}}`);
+
+  const descriptions = (batch.riders || [])
+    .map((rider) => riderEffects[rider]?.label)
+    .filter(Boolean);
+  if (descriptions.length) rows.push(`{{Effects=${descriptions.join(", ")}}}`);
+  return rows.join(" ");
+}
+
+async function copyEmbueMacro(textarea) {
+  try {
+    await navigator.clipboard.writeText(textarea.value);
+  } catch {
+    textarea.select();
+    document.execCommand("copy");
   }
 }
 
@@ -210,6 +264,10 @@ function loadEmbue() {
     remainingCharges: chosen.charges,
     powerDice: chosen.powerDice,
     riders: chosen.riders,
+    characterName: window.selectedCharacterProfile().name,
+    spiritModifier: window.selectedCharacterProfile().spirit_modifier,
+    proficiency: resources.proficiency,
+    element: resources.element || window.selectedCharacterProfile().default_element || "fire",
   });
   saveResources();
   saveBatches();
