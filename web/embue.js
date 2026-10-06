@@ -1,5 +1,5 @@
-const resourceStorageKey = "spirit-attack-builder-resources";
-const embueStorageKey = "spirit-attack-builder-batches";
+const resourceStorageKey = () => `spirit-attack-builder-resources-${window.selectedCharacterId() || "1"}`;
+const embueStorageKey = () => `spirit-attack-builder-batches-${window.selectedCharacterId() || "1"}`;
 const riderEffects = {
   dexterity_prone: { label: "Dexterity — Prone", cost: 2 },
   strength_prone_knockback: { label: "Strength — Prone + knockback", cost: 4 },
@@ -20,12 +20,14 @@ function proficiencyForLevel(level) {
 function readResources() {
   let saved = null;
   try {
-    saved = JSON.parse(localStorage.getItem(resourceStorageKey));
+    saved = JSON.parse(localStorage.getItem(resourceStorageKey()));
   } catch {
     // Fall back to the builder's initial character values if storage is unreadable.
   }
 
-  const level = Math.max(1, Number(saved?.level) || 5);
+  const defaultLevel = window.selectedCharacterProfile()?.default_level || 4;
+  const defaultElement = window.selectedCharacterProfile()?.default_element || "fire";
+  const level = Math.max(1, Number(saved?.level) || defaultLevel);
   const proficiency = proficiencyForLevel(level);
   const spiritMax = level * 3;
   const proficiencyMax = proficiency;
@@ -33,6 +35,8 @@ function readResources() {
   const savedProficiency = saved?.proficiencyPoints == null ? proficiencyMax : Number(saved.proficiencyPoints);
   return {
     level,
+    default_level: defaultLevel,
+    element: saved?.element || defaultElement,
     proficiency,
     spiritPoints: Math.min(spiritMax, Math.max(0, Number.isFinite(savedSpirit) ? savedSpirit : spiritMax)),
     proficiencyPoints: Math.min(proficiencyMax, Math.max(0, Number.isFinite(savedProficiency) ? savedProficiency : proficiencyMax)),
@@ -41,7 +45,7 @@ function readResources() {
 
 function saveResources() {
   try {
-    localStorage.setItem(resourceStorageKey, JSON.stringify(resources));
+    localStorage.setItem(resourceStorageKey(), JSON.stringify(resources));
   } catch {
     showMessage("Could not save point pools in this browser.", true);
   }
@@ -49,7 +53,7 @@ function saveResources() {
 
 function readBatches() {
   try {
-    const saved = JSON.parse(localStorage.getItem(embueStorageKey));
+    const saved = JSON.parse(localStorage.getItem(embueStorageKey()));
     return Array.isArray(saved) ? saved : [];
   } catch {
     return [];
@@ -58,7 +62,7 @@ function readBatches() {
 
 function saveBatches() {
   try {
-    localStorage.setItem(embueStorageKey, JSON.stringify(batches));
+    localStorage.setItem(embueStorageKey(), JSON.stringify(batches));
   } catch {
     showMessage("Could not save Embue charges in this browser.", true);
   }
@@ -249,9 +253,14 @@ function init() {
   $("load-embue").addEventListener("click", loadEmbue);
   $("start-round").addEventListener("click", startRound);
   $("long-rest").addEventListener("click", longRest);
+  window.addEventListener("characterchange", () => {
+    resources = readResources();
+    batches = readBatches();
+    render();
+  });
   window.addEventListener("storage", (event) => {
-    if (event.key === resourceStorageKey) resources = readResources();
-    if (event.key === embueStorageKey) batches = readBatches();
+    if (event.key === resourceStorageKey()) resources = readResources();
+    if (event.key === embueStorageKey()) batches = readBatches();
     render();
   });
   render();

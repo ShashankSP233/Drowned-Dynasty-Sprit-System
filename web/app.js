@@ -3,8 +3,8 @@ let calculateAttack = null;
 let spiritPoints = 0;
 let proficiencyPoints = 0;
 let currentAttackCost = 0;
-const resourceStorageKey = "spirit-attack-builder-resources";
-const embueStorageKey = "spirit-attack-builder-batches";
+const resourceStorageKey = () => `spirit-attack-builder-resources-${window.selectedCharacterId() || "1"}`;
+const embueStorageKey = () => `spirit-attack-builder-batches-${window.selectedCharacterId() || "1"}`;
 
 const $ = (id) => document.getElementById(id);
 
@@ -20,6 +20,14 @@ const featureText = {
   wood: "Next attack gains a bonus to hit",
   metal: "Next save is reduced",
   earth: "Next attack's damage is reduced",
+};
+
+const riderSaveAbilities = {
+  dexterity_prone: "Dexterity",
+  strength_prone_knockback: "Strength",
+  constitution_blind: "Constitution",
+  strength_restrained: "Strength",
+  constitution_incapacitate: "Constitution",
 };
 
 function populateAoeSizes() {
@@ -42,6 +50,7 @@ function collectAttack() {
 
   return {
     element: $("element").value,
+    character_id: window.selectedCharacterId() || "1",
     level: Math.max(1, Number($("level").value) || 1),
     proficiency: Number($("prof").value) || 0,
     power_dice: Number($("power").value) || 0,
@@ -71,8 +80,13 @@ function render(result) {
   $("preview-name").textContent =
     `${element[0].toUpperCase() + element.slice(1)} Spirit Attack`;
   $("preview-damage").textContent = result.damage;
+  const attackBonus = result.attack_bonus >= 0 ? `+${result.attack_bonus}` : result.attack_bonus;
+  const resolution = getResolution(attackBonus);
+  $("roll20-macro").value = buildRoll20Macro(result, resolution);
 
-  const tags = [];
+  const tags = resolution.type === "attack"
+    ? [`Attack ${attackBonus}`]
+    : resolution.abilities.map((ability) => `${ability} Save DC ${result.save_dc}`);
   if (Number($("distance").value)) tags.push(`${$("distance").value} ft`);
   else tags.push("Touch");
 
@@ -95,6 +109,68 @@ function render(result) {
     : `<small>No optional components selected.</small>`;
 }
 
+function getResolution(attackBonus) {
+  const abilities = [...new Set(
+    [...document.querySelectorAll(".rider:checked")]
+      .map((input) => riderSaveAbilities[input.value])
+      .filter(Boolean)
+  )];
+  if (abilities.length) return { type: "save", abilities };
+  if ($("aoe-enabled").checked) return { type: "save", abilities: ["Dexterity"] };
+  return { type: "attack", attackBonus };
+}
+
+function buildRoll20Macro(result, resolution) {
+  const characterName = result.character_name.replace(/[{}|]/g, "");
+  const element = result.element[0].toUpperCase() + result.element.slice(1);
+  const rows = [`&{template:default} {{name=${characterName} — ${element} Spirit Attack}}`];
+  if (resolution.type === "attack")
+    rows.push(`{{Attack=[[1d20${resolution.attackBonus}]]}}`);
+  else
+    for (const ability of resolution.abilities)
+      rows.push(`{{${ability} Save DC=${result.save_dc}}}`);
+  if (Number($("power").value) > 0)
+    rows.push(`{{Damage=[[${$("power").value}d6]]}}`);
+  const effects = [...document.querySelectorAll(".rider:checked")]
+    .map((input) => input.parentElement.textContent.trim().replace(/\s+\d+$/, ""));
+  if ($("element-feature").checked) effects.push(featureText[result.element]);
+  if (effects.length) rows.push(`{{Effects=${effects.join(", ")}}}`);
+  return rows.join(" ");
+}
+
+async function copyRoll20Macro() {
+  const macro = $("roll20-macro").value;
+  try {
+    await navigator.clipboard.writeText(macro);
+  } catch {
+    $("roll20-macro").select();
+    document.execCommand("copy");
+  }
+  $("macro-status").textContent = "Macro copied. Paste it into Roll20 chat.";
+}
+
+function populateCharacters(characters) {
+  window.setCharacterProfiles(characters);
+  for (const profile of characters) {
+    const key = `spirit-attack-builder-resources-${profile.id}`;
+    try {
+      const saved = JSON.parse(localStorage.getItem(key));
+      if (!saved) continue;
+      if (saved.default_level == null && Number(saved.level) === 5 && profile.default_level === 4) {
+        saved.level = profile.default_level;
+        saved.proficiency = Math.floor(saved.level / 4) + (saved.level % 4 > 0 ? 1 : 0) + 1;
+        saved.spiritPoints = Math.min(Number(saved.spiritPoints) || 0, saved.level * 3);
+        saved.proficiencyPoints = Math.min(Number(saved.proficiencyPoints) || 0, saved.proficiency);
+      }
+      saved.default_level = profile.default_level;
+      localStorage.setItem(key, JSON.stringify(saved));
+    } catch {
+      // Leave an unreadable profile record untouched; normal restore uses defaults.
+    }
+  }
+  loadSelectedCharacter();
+}
+
 function renderPools() {
   const level = Math.max(1, Number($("level").value) || 1);
   const proficiency = Math.max(0, Number($("prof").value) || 0);
@@ -115,9 +191,11 @@ function updatePoolMaximums() {
 
 function saveResources() {
   try {
-    localStorage.setItem(resourceStorageKey, JSON.stringify({
+    localStorage.setItem(resourceStorageKey(), JSON.stringify({
       level: Number($("level").value) || 1,
+      default_level: window.selectedCharacterProfile()?.default_level || 4,
       proficiency: Math.max(0, Number($("prof").value) || 0),
+      element: $("element").value,
       spiritPoints,
       proficiencyPoints,
     }));
@@ -128,7 +206,7 @@ function saveResources() {
 
 function restoreResources() {
   try {
-    const saved = JSON.parse(localStorage.getItem(resourceStorageKey));
+    const saved = JSON.parse(localStorage.getItem(resourceStorageKey()));
     if (!saved) return false;
 
     const level = Math.min(20, Math.max(1, Number(saved.level) || 1));
@@ -138,11 +216,14 @@ function restoreResources() {
     const savedProficiency = saved.proficiencyPoints == null ? proficiency : Number(saved.proficiencyPoints);
     $("level").value = level;
     $("prof").value = proficiency;
+    const validElements = ["fire", "water", "wood", "metal", "earth"];
+    const defaultElement = window.selectedCharacterProfile()?.default_element || "fire";
+    $("element").value = validElements.includes(saved.element) ? saved.element : defaultElement;
     spiritPoints = Math.min(spiritMax, Math.max(0, Number.isFinite(savedSpirit) ? savedSpirit : spiritMax));
     proficiencyPoints = Math.min(proficiency, Math.max(0, Number.isFinite(savedProficiency) ? savedProficiency : proficiency));
     return true;
   } catch {
-    try { localStorage.removeItem(resourceStorageKey); } catch { /* Ignore unavailable storage. */ }
+    try { localStorage.removeItem(resourceStorageKey()); } catch { /* Ignore unavailable storage. */ }
     return false;
   }
 }
@@ -168,7 +249,21 @@ function startRound() {
 function takeLongRest() {
   spiritPoints = Math.max(1, Number($("level").value) || 1) * 3;
   startRound();
-  try { localStorage.removeItem(embueStorageKey); } catch { /* Ignore unavailable storage. */ }
+  try { localStorage.removeItem(embueStorageKey()); } catch { /* Ignore unavailable storage. */ }
+}
+
+function loadSelectedCharacter() {
+  $("level").value = window.selectedCharacterProfile()?.default_level || 4;
+  $("element").value = window.selectedCharacterProfile()?.default_element || "fire";
+  const restored = restoreResources();
+  if (!restored) {
+    const level = Math.max(1, Number($("level").value) || 1);
+    $("prof").value = Math.floor(level / 4) + (level % 4 > 0 ? 1 : 0) + 1;
+    spiritPoints = level * 3;
+    proficiencyPoints = Number($("prof").value);
+    saveResources();
+  }
+  update();
 }
 
 async function update() {
@@ -192,7 +287,7 @@ async function update() {
 
 async function loadPythonFiles() {
   // Keep the Python package structure so its relative imports continue to work.
-  const names = ["__init__.py", "rules.py", "attack.py", "player.py"];
+  const names = ["__init__.py", "rules.py", "attack.py", "player.py", "characters.py"];
   pyodide.FS.mkdir("/app");
   pyodide.FS.mkdir("/app/backend");
 
@@ -206,6 +301,8 @@ async function loadPythonFiles() {
 
 async function init() {
   populateAoeSizes();
+  $("level").value = window.selectedCharacterProfile()?.default_level || 4;
+  $("element").value = window.selectedCharacterProfile()?.default_element || "fire";
   const restored = restoreResources();
   const initialLevel = Math.max(1, Number($("level").value) || 1);
   $("prof").value = Math.floor(initialLevel / 4)
@@ -223,6 +320,8 @@ async function init() {
   $("use-attack").addEventListener("click", useAttack);
   $("start-round").addEventListener("click", startRound);
   $("long-rest").addEventListener("click", takeLongRest);
+  $("copy-macro").addEventListener("click", copyRoll20Macro);
+  window.addEventListener("characterchange", loadSelectedCharacter);
 
   $("aoe-enabled").addEventListener("change", () => {
     $("aoe-controls").classList.toggle(
@@ -240,7 +339,7 @@ async function init() {
   $("builder").addEventListener("input", update);
   $("builder").addEventListener("change", update);
   window.addEventListener("storage", (event) => {
-    if (event.key === resourceStorageKey && event.newValue) {
+    if (event.key === resourceStorageKey() && event.newValue) {
       try {
         const saved = JSON.parse(event.newValue);
         $("level").value = saved.level;
@@ -266,10 +365,15 @@ sys.path.insert(0, "/app")
 
     await pyodide.runPythonAsync(`
 from backend.attack import SpiritAttack
+from backend.characters import get_character, list_characters
 import json
+
+def list_characters_js():
+    return json.dumps(list_characters())
 
 def calculate_attack_js(data_json):
     data = json.loads(data_json)
+    character = get_character(data["character_id"])
     attack = SpiritAttack(
         element=data["element"],
         level=data["level"],
@@ -283,10 +387,20 @@ def calculate_attack_js(data_json):
         element_feature=data["element_feature"],
         element_feature_cost_value=data["element_feature_cost_value"],
     )
-    return json.dumps(attack.calculate())
+    result = attack.calculate()
+    result.update({
+        "character_id": character["id"],
+        "character_name": character["name"],
+        "spirit_modifier": character["spirit_modifier"],
+        "attack_bonus": character["spirit_modifier"] + data["proficiency"],
+        "save_dc": 8 + character["spirit_modifier"] + data["proficiency"],
+    })
+    return json.dumps(result)
 `);
 
     calculateAttack = pyodide.globals.get("calculate_attack_js");
+    const charactersJson = pyodide.globals.get("list_characters_js")();
+    populateCharacters(JSON.parse(charactersJson));
     $("python-status").textContent = "Python engine ready";
     $("python-status").style.color = "#8fcf9a";
     await update();

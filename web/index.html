@@ -18,7 +18,10 @@
           <a class="nav-button" href="embue.html">Embue Tracker</a>
         </nav>
       </div>
-      <div id="python-status" class="status">Loading Python…</div>
+      <div class="header-tools">
+        <button id="active-character" class="character-switch" type="button">Choose character</button>
+        <div id="python-status" class="status">Loading Python…</div>
+      </div>
     </header>
 
     <section class="layout">
@@ -27,7 +30,7 @@
 
         <div class="grid two">
           <label>Level
-            <input id="level" type="number" min="1" max="20" value="5">
+            <input id="level" type="number" min="1" max="20" value="4">
           </label>
           <label>Proficiency
             <input id="prof" type="number" min="0" max="6" value="3" readonly>
@@ -135,6 +138,14 @@
             <div id="preview-tags"></div>
           </div>
           <div id="warning" class="warning"></div>
+          <div class="section">
+            <div class="section-title">
+              <h3>Roll20 Macro</h3>
+              <button id="copy-macro" type="button">Copy Macro</button>
+            </div>
+            <textarea id="roll20-macro" rows="4" readonly aria-label="Generated Roll20 macro"></textarea>
+            <small id="macro-status">Copy this into Roll20 chat to roll the attack.</small>
+          </div>
         </section>
 
         <section class="panel">
@@ -150,7 +161,21 @@
     </footer>
   </main>
 
+  <div id="character-dialog" class="character-dialog" hidden>
+    <section class="panel character-dialog-card" role="dialog" aria-modal="true" aria-labelledby="character-dialog-title">
+      <h2 id="character-dialog-title">Choose your character</h2>
+      <p class="sub">Your points, attack bonus, and save DC will use this profile.</p>
+      <label>Character profile
+        <select id="character-choice" aria-label="Character profile"></select>
+      </label>
+      <div class="character-dialog-actions">
+        <button id="cancel-character" type="button" hidden>Cancel</button>
+        <button id="confirm-character" class="primary-button" type="button">Continue</button>
+      </div>
+    </section>
+  </div>
   <script src="https://cdn.jsdelivr.net/pyodide/v0.27.2/full/pyodide.js"></script>
+  <script src="character-picker.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

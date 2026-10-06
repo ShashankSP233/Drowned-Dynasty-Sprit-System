@@ -18,6 +18,7 @@
           <a class="nav-button active" href="embue.html" aria-current="page">Embue Tracker</a>
         </nav>
       </div>
+      <button id="active-character" class="character-switch" type="button">Choose character</button>
     </header>
 
     <section class="layout">
@@ -94,6 +95,20 @@
       <span>Saved on this device</span>
     </footer>
   </main>
+  <div id="character-dialog" class="character-dialog" hidden>
+    <section class="panel character-dialog-card" role="dialog" aria-modal="true" aria-labelledby="character-dialog-title">
+      <h2 id="character-dialog-title">Choose your character</h2>
+      <p class="sub">Your point pools and loaded charges belong to this profile.</p>
+      <label>Character profile
+        <select id="character-choice" aria-label="Character profile"></select>
+      </label>
+      <div class="character-dialog-actions">
+        <button id="cancel-character" type="button" hidden>Cancel</button>
+        <button id="confirm-character" class="primary-button" type="button">Continue</button>
+      </div>
+    </section>
+  </div>
+  <script src="character-picker.js"></script>
   <script src="embue.js"></script>
 </body>
 </html>

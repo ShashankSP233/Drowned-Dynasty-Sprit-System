@@ -7,6 +7,7 @@
 - `web/backend/rules.py` — source-of-truth rules and costs
 - `web/backend/attack.py` — attack construction and calculation
 - `web/backend/player.py` — player resource model
+- `web/backend/characters.py` — six starter character profiles and Spirit modifiers
 - `web/index.html` — UI
 - `web/embue.html` and `web/embue.js` — Embue loadout and charge tracker
 - `web/style.css` — styling
@@ -54,6 +55,10 @@ The document states:
 - Unused Embue charges clear on a long rest.
 - Element feature toggle = 1 point
 - Riders use the listed costs
+- Spirit attack bonus = Spirit modifier + proficiency; save DC = 8 + Spirit modifier + proficiency
+- Starter profiles Character 1–6 currently each have a +4 Spirit modifier, default level 4, and default element Fire; each profile can be edited independently in `web/backend/characters.py`
+- On first use, choose a character profile; its name stays in the top-right switcher, and each profile has separate point pools and Embue charges shared between the two pages on that browser
+- The attack preview generates a copyable Roll20 macro with an attack roll, save DC, selected damage dice, and selected effects
 
 The exact effects of each element feature follow the selected element.
 
