@@ -13,6 +13,10 @@
         <p class="eyebrow">DROWNED DYNASTY</p>
         <h1>Spirit Attack Builder</h1>
         <p class="sub">Build an attack and see exactly where every mana point goes.</p>
+        <nav class="page-nav" aria-label="Page navigation">
+          <a class="nav-button active" href="index.html" aria-current="page">Attack Builder</a>
+          <a class="nav-button" href="embue.html">Embue Tracker</a>
+        </nav>
       </div>
       <div id="python-status" class="status">Loading Python…</div>
     </header>
@@ -26,7 +30,7 @@
             <input id="level" type="number" min="1" max="20" value="5">
           </label>
           <label>Proficiency
-            <input id="prof" type="number" min="0" max="6" value="3">
+            <input id="prof" type="number" min="0" max="6" value="3" readonly>
           </label>
         </div>
 
@@ -76,15 +80,6 @@
               <select id="aoe-size"></select>
             </label>
           </div>
-        </div>
-
-        <div class="section">
-          <h3>Embue</h3>
-          <div class="range-row">
-            <input id="embue" type="range" min="0" max="5" value="0">
-            <strong id="embue-value">0</strong>
-          </div>
-          <small>1 point per charge. Maximum charges = level.</small>
         </div>
 
         <div class="section">

@@ -4,6 +4,7 @@ let spiritPoints = 0;
 let proficiencyPoints = 0;
 let currentAttackCost = 0;
 const resourceStorageKey = "spirit-attack-builder-resources";
+const embueStorageKey = "spirit-attack-builder-batches";
 
 const $ = (id) => document.getElementById(id);
 
@@ -31,10 +32,8 @@ function populateAoeSizes() {
 function clampPowerToLevel() {
   const level = Math.max(1, Number($("level").value) || 1);
   $("power").max = level;
-  $("embue").max = level;
-  $("power-value").textContent = `${$("power").value}d6`;
   if (Number($("power").value) > level) $("power").value = level;
-  if (Number($("embue").value) > level) $("embue").value = level;
+  $("power-value").textContent = `${$("power").value}d6`;
 }
 
 function collectAttack() {
@@ -44,26 +43,21 @@ function collectAttack() {
   return {
     element: $("element").value,
     level: Math.max(1, Number($("level").value) || 1),
-    proficiency: Math.max(0, Number($("prof").value) || 0),
+    proficiency: Number($("prof").value) || 0,
     power_dice: Number($("power").value) || 0,
     distance: Number($("distance").value) || 0,
     aoe_shape: $("aoe-enabled").checked ? $("aoe-shape").value : null,
     aoe_size: $("aoe-enabled").checked ? Number($("aoe-size").value) : null,
-    embue_charges: Number($("embue").value) || 0,
+    embue_charges: 0,
     riders,
     element_feature: $("element-feature").checked,
-    element_feature_cost_value: 0,
+    element_feature_cost_value: 1,
   };
 }
 
 function render(result) {
-  const level = Number($("level").value) || 1;
-  const spiritMax = level * 3;
-  const proficiencyMax = Math.max(0, Number($("prof").value) || 0);
-
   $("total").textContent = result.total_cost;
-  $("spirit-pool").textContent = `${spiritPoints} / ${spiritMax}`;
-  $("proficiency-pool").textContent = `${proficiencyPoints} / ${proficiencyMax}`;
+  renderPools();
   currentAttackCost = result.total_cost;
   $("use-attack").disabled = result.total_cost > spiritPoints + proficiencyPoints;
 
@@ -85,9 +79,6 @@ function render(result) {
   if ($("aoe-enabled").checked)
     tags.push(`${$("aoe-shape").value} ${$("aoe-size").value} ft`);
 
-  if (Number($("embue").value))
-    tags.push(`${$("embue").value} Embue`);
-
   if ($("element-feature").checked)
     tags.push("Element feature");
 
@@ -104,12 +95,22 @@ function render(result) {
     : `<small>No optional components selected.</small>`;
 }
 
+function renderPools() {
+  const level = Math.max(1, Number($("level").value) || 1);
+  const proficiency = Math.max(0, Number($("prof").value) || 0);
+  $("spirit-pool").textContent = `${spiritPoints} / ${level * 3}`;
+  $("proficiency-pool").textContent = `${proficiencyPoints} / ${proficiency}`;
+}
+
 function updatePoolMaximums() {
-  const spiritMax = Math.max(1, Number($("level").value) || 1) * 3;
-  const proficiencyMax = Math.max(0, Number($("prof").value) || 0);
+  const level = Math.max(1, Number($("level").value) || 1);
+  const spiritMax = level * 3;
+  const proficiencyMax = Math.floor(level / 4) + (level % 4 > 0 ? 1 : 0) + 1;
+  $("prof").value = proficiencyMax;
   spiritPoints = Math.min(spiritPoints, spiritMax);
   proficiencyPoints = Math.min(proficiencyPoints, proficiencyMax);
   saveResources();
+  renderPools();
 }
 
 function saveResources() {
@@ -128,13 +129,21 @@ function saveResources() {
 function restoreResources() {
   try {
     const saved = JSON.parse(localStorage.getItem(resourceStorageKey));
-    if (saved?.level === (Number($("level").value) || 1)
-      && saved?.proficiency === (Number($("prof").value) || 0)) {
-      spiritPoints = Math.min(spiritPoints, Math.max(0, Number(saved.spiritPoints) || 0));
-      proficiencyPoints = Math.min(proficiencyPoints, Math.max(0, Number(saved.proficiencyPoints) || 0));
-    }
+    if (!saved) return false;
+
+    const level = Math.min(20, Math.max(1, Number(saved.level) || 1));
+    const proficiency = Math.floor(level / 4) + (level % 4 > 0 ? 1 : 0) + 1;
+    const spiritMax = level * 3;
+    const savedSpirit = saved.spiritPoints == null ? spiritMax : Number(saved.spiritPoints);
+    const savedProficiency = saved.proficiencyPoints == null ? proficiency : Number(saved.proficiencyPoints);
+    $("level").value = level;
+    $("prof").value = proficiency;
+    spiritPoints = Math.min(spiritMax, Math.max(0, Number.isFinite(savedSpirit) ? savedSpirit : spiritMax));
+    proficiencyPoints = Math.min(proficiency, Math.max(0, Number.isFinite(savedProficiency) ? savedProficiency : proficiency));
+    return true;
   } catch {
     try { localStorage.removeItem(resourceStorageKey); } catch { /* Ignore unavailable storage. */ }
+    return false;
   }
 }
 
@@ -145,18 +154,21 @@ function useAttack() {
   proficiencyPoints -= fromProficiency;
   spiritPoints -= currentAttackCost - fromProficiency;
   saveResources();
+  renderPools();
   update();
 }
 
 function startRound() {
   proficiencyPoints = Math.max(0, Number($("prof").value) || 0);
   saveResources();
+  renderPools();
   update();
 }
 
 function takeLongRest() {
   spiritPoints = Math.max(1, Number($("level").value) || 1) * 3;
   startRound();
+  try { localStorage.removeItem(embueStorageKey); } catch { /* Ignore unavailable storage. */ }
 }
 
 async function update() {
@@ -194,10 +206,20 @@ async function loadPythonFiles() {
 
 async function init() {
   populateAoeSizes();
-  spiritPoints = Math.max(1, Number($("level").value) || 1) * 3;
-  proficiencyPoints = Math.max(0, Number($("prof").value) || 0);
-  restoreResources();
-
+  const restored = restoreResources();
+  const initialLevel = Math.max(1, Number($("level").value) || 1);
+  $("prof").value = Math.floor(initialLevel / 4)
+    + (initialLevel % 4 > 0 ? 1 : 0) + 1;
+  clampPowerToLevel();
+  if (!restored) {
+    spiritPoints = initialLevel * 3;
+    proficiencyPoints = Number($("prof").value);
+  }
+  renderPools();
+  saveResources();
+  $("power").addEventListener("input", () => {
+    $("power-value").textContent = `${$("power").value}d6`;
+  });
   $("use-attack").addEventListener("click", useAttack);
   $("start-round").addEventListener("click", startRound);
   $("long-rest").addEventListener("click", takeLongRest);
@@ -217,6 +239,21 @@ async function init() {
 
   $("builder").addEventListener("input", update);
   $("builder").addEventListener("change", update);
+  window.addEventListener("storage", (event) => {
+    if (event.key === resourceStorageKey && event.newValue) {
+      try {
+        const saved = JSON.parse(event.newValue);
+        $("level").value = saved.level;
+        $("prof").value = saved.proficiency;
+        spiritPoints = saved.spiritPoints;
+        proficiencyPoints = saved.proficiencyPoints;
+        renderPools();
+        update();
+      } catch {
+        // Ignore incomplete data from another tab.
+      }
+    }
+  });
 
   try {
     pyodide = await loadPyodide();

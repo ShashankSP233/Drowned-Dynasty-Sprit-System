@@ -46,6 +46,22 @@ h2 { margin: 0 0 16px; font-size: 20px; }
 h3 { margin: 0 0 10px; font-size: 14px; }
 .sub { color: var(--muted); margin: 8px 0 0; }
 
+.page-nav { display: flex; gap: 8px; margin-top: 14px; }
+.nav-button {
+  display: inline-block;
+  border: 1px solid #454c56;
+  border-radius: 10px;
+  padding: 10px 16px;
+  color: var(--text);
+  background: linear-gradient(180deg, #222730, #191d23);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: border-color .15s ease, background .15s ease, transform .15s ease;
+}
+.nav-button:hover { border-color: var(--accent); transform: translateY(-1px); }
+.nav-button.active { border-color: var(--accent); color: #15181d; background: var(--accent); }
+
 .status {
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -240,6 +256,24 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 }
 
 .warning.bad { color: var(--danger); }
+
+.batch-list { display: grid; gap: 12px; }
+.batch-card { border: 1px solid var(--border); border-radius: 12px; padding: 14px; background: var(--panel2); }
+.batch-top { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.batch-title { font-weight: 700; }
+.batch-remaining { color: var(--accent); font-weight: 700; white-space: nowrap; }
+.batch-effects { color: var(--muted); margin: 9px 0 12px; }
+.batch-card.spent { opacity: .55; }
+.embue-cost { display: grid; gap: 6px; margin: 14px 0; padding: 12px; background: var(--panel2); border-radius: 10px; }
+.embue-cost-row { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 3px 0; }
+.embue-cost-row span { color: var(--muted); }
+.embue-cost-row strong { white-space: nowrap; }
+.embue-cost-total { border-top: 1px solid var(--border); padding-top: 10px; margin-top: 4px; font-weight: 700; }
+.embue-cost-total span { color: var(--text); }
+.embue-cost-total strong { color: var(--accent); }
+.embue-summary #load-embue { border-color: var(--accent); background: var(--accent); color: #15181d; font-weight: 700; }
+.embue-summary #load-embue:hover:not(:disabled) { background: #e3ba68; }
+.embue-summary #load-embue small { display: inline-block; color: inherit; font-size: 11px; }
 
 footer {
   display: flex;

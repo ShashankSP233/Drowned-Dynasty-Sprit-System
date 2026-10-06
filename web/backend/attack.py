@@ -27,8 +27,7 @@ class SpiritAttack:
     embue_charges: int = 0
     riders: list[str] = field(default_factory=list)
 
-    # The source document contains "Unique feature 1=each".
-    # This remains an explicit toggle, but its cost is configurable.
+    # The selected element feature costs 1 point when enabled in the builder.
     element_feature: bool = False
     element_feature_cost_value: int = 1
 

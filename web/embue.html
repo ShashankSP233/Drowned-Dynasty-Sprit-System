@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Embue Tracker · Spirit Attack Builder</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div>
+        <p class="eyebrow">DROWNED DYNASTY</p>
+        <h1>Embue Tracker</h1>
+        <p class="sub">Load effects as a bonus action, then spend one charge on each hit.</p>
+        <nav class="page-nav" aria-label="Page navigation">
+          <a class="nav-button" href="index.html">Attack Builder</a>
+          <a class="nav-button active" href="embue.html" aria-current="page">Embue Tracker</a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="layout">
+      <form id="embue-form" class="panel">
+        <h2>Load an Embue</h2>
+        <label>Charges to load
+          <input id="charges" type="number" min="1" step="1" value="1">
+        </label>
+        <small id="charge-limit">Maximum held charges equals character level.</small>
+
+        <div class="section">
+          <h3>Effects on each charged hit</h3>
+          <label for="power">Bonus Power</label>
+          <div class="range-row">
+            <input id="power" type="range" min="0" max="3" value="0" aria-label="Bonus Power">
+            <strong id="power-value">0d6</strong>
+          </div>
+          <small>1 point per d6. Maximum bonus Power equals proficiency.</small>
+        </div>
+
+        <div class="section">
+          <h3>Riders</h3>
+          <div class="checks">
+            <label><input class="rider" type="checkbox" value="dexterity_prone"> Dexterity — Prone <b>2</b></label>
+            <label><input class="rider" type="checkbox" value="strength_prone_knockback"> Strength — Prone + knockback <b>4</b></label>
+            <label><input class="rider" type="checkbox" value="constitution_blind"> Constitution — Blind <b>6</b></label>
+            <label><input class="rider" type="checkbox" value="strength_restrained"> Strength — Restrained <b>8</b></label>
+            <label><input class="rider" type="checkbox" value="constitution_incapacitate"> Constitution — Incapacitate <b>10</b></label>
+            <label><input class="rider" type="checkbox" value="difficult_terrain"> Difficult terrain — 1 minute <b>2</b></label>
+          </div>
+          <small>Range and area of effect cannot be loaded into Embue.</small>
+        </div>
+
+      </form>
+
+      <aside class="right">
+        <section class="panel embue-summary">
+          <div class="total-card">
+            <div>
+              <small>MANA REQUIRED</small>
+              <div id="total-cost" class="big">0</div>
+            </div>
+            <button id="load-embue" type="button" disabled>Load Embue<br><small>Bonus Action</small></button>
+          </div>
+          <div id="cost-breakdown" class="embue-cost"></div>
+          <div class="resource-pools">
+            <div class="resource-pool">
+              <small>SPIRIT POINTS · LONG REST</small>
+              <strong id="spirit-pool">15 / 15</strong>
+            </div>
+            <div class="resource-pool">
+              <small>PROFICIENCY POINTS · EACH ROUND</small>
+              <strong id="proficiency-pool">3 / 3</strong>
+            </div>
+          </div>
+          <div class="resource-actions">
+            <button id="start-round" type="button">Start Round</button>
+            <button id="long-rest" type="button">Long Rest</button>
+          </div>
+          <div id="message" class="warning" aria-live="polite"></div>
+          <small class="resource-note">Costs spend proficiency points first, then spirit points. A long rest restores both pools and clears unused Embue charges.</small>
+        </section>
+
+        <section class="panel">
+          <h2>Loaded Charges</h2>
+          <p id="held-count" class="sub"></p>
+          <div id="batches" class="batch-list"></div>
+        </section>
+      </aside>
+    </section>
+
+    <footer>
+      <span>Charges are spent on a hit, not on a miss.</span>
+      <span>Saved on this device</span>
+    </footer>
+  </main>
+  <script src="embue.js"></script>
+</body>
+</html>
