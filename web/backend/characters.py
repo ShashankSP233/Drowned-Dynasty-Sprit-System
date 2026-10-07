@@ -3,9 +3,9 @@
 # Edit each profile's name and Spirit modifier independently.
 CHARACTERS = {
     "1": {"id": "1", "name": "Sion Luminous", "spirit_modifier": 4, "default_level": 4, "default_element": "fire"},
-    "2": {"id": "2", "name": "Xaoli", "spirit_modifier": 4, "default_level": 4, "default_element": "wood"},
+    "2": {"id": "2", "name": "Xaioli", "spirit_modifier": 4, "default_level": 4, "default_element": "wood"},
     "3": {"id": "3", "name": "Garris", "spirit_modifier": 4, "default_level": 4, "default_element": "metal"},
-    "4": {"id": "4", "name": "Craig", "spirit_modifier": 4, "default_level": 4, "default_element": "earth"},
+    "4": {"id": "4", "name": "Craig", "spirit_modifier": 3, "default_level": 4, "default_element": "earth"},
     "5": {"id": "5", "name": "Ying Yue", "spirit_modifier": 4, "default_level": 4, "default_element": "water"},
     "6": {"id": "6", "name": "Light (DM)", "spirit_modifier": 4, "default_level": 4, "default_element": "fire"},
 }
