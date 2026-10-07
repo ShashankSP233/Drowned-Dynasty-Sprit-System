@@ -1,3 +1,4 @@
 This starter project is provided for Light's D&D campaign project.
 
 The Drowned Dynasty rules text is the user's supplied campaign/homebrew material.
+Use and modify to your heart's content, unless you are cadence or Garris (they know what they did)
