@@ -1,14 +1,22 @@
-"""Character profiles used by the Spirit Attack Builder."""
+"""Character profiles used by the Spirit Attack Builder.
 
-# Edit each profile's name and Spirit modifier independently.
-CHARACTERS = {
-    "1": {"id": "1", "name": "Sion Luminous", "spirit_modifier": 4, "default_level": 4, "default_element": "fire"},
-    "2": {"id": "2", "name": "Xaoli", "spirit_modifier": 4, "default_level": 4, "default_element": "wood"},
-    "3": {"id": "3", "name": "Garris", "spirit_modifier": 4, "default_level": 4, "default_element": "metal"},
-    "4": {"id": "4", "name": "Craig", "spirit_modifier": 4, "default_level": 4, "default_element": "earth"},
-    "5": {"id": "5", "name": "Ying Yue", "spirit_modifier": 4, "default_level": 4, "default_element": "water"},
-    "6": {"id": "6", "name": "Light (DM)", "spirit_modifier": 4, "default_level": 4, "default_element": "fire"},
-}
+The profile data lives in characters.json so the Python rules engine
+(Attack Builder) and the plain-JavaScript Embue page read the same source.
+Edit each profile's name, Spirit modifier, level and element in that file.
+"""
+
+import json
+from pathlib import Path
+
+_DATA_FILE = Path(__file__).with_name("characters.json")
+
+
+def _load() -> dict[str, dict[str, str | int]]:
+    profiles = json.loads(_DATA_FILE.read_text(encoding="utf-8"))
+    return {str(profile["id"]): profile for profile in profiles}
+
+
+CHARACTERS = _load()
 
 
 def list_characters() -> list[dict[str, str | int]]:

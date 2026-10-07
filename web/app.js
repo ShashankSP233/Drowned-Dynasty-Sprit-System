@@ -296,7 +296,7 @@ async function update() {
 
 async function loadPythonFiles() {
   // Keep the Python package structure so its relative imports continue to work.
-  const names = ["__init__.py", "rules.py", "attack.py", "player.py", "characters.py"];
+  const names = ["__init__.py", "rules.py", "attack.py", "player.py", "characters.py", "characters.json"];
   pyodide.FS.mkdir("/app");
   pyodide.FS.mkdir("/app/backend");
 

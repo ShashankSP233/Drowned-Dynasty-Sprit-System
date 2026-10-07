@@ -133,6 +133,20 @@
   refreshButton();
   if (!chosenId) openDialog();
   window.setCharacterProfiles = setProfiles;
+  // Load the shared profile list on every page, so the Embue page does not
+  // depend on the Attack Builder having been opened first.
+  fetch("backend/characters.json", { cache: "no-cache" })
+    .then((response) => {
+      if (!response.ok) throw new Error("characters.json not found");
+      return response.json();
+    })
+    .then((loaded) => {
+      if (!Array.isArray(loaded) || !loaded.length) return;
+      setProfiles(loaded);
+      if (!chosenId) openDialog();
+      else window.dispatchEvent(new CustomEvent("characterchange", { detail: { id: chosenId } }));
+    })
+    .catch(() => { /* Keep cached or default profiles if the file cannot be loaded. */ });
   window.selectedCharacterId = selectedCharacterId;
   window.selectedCharacterProfile = selectedCharacterProfile;
 })();

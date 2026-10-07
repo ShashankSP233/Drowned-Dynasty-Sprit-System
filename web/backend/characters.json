@@ -1,0 +1,8 @@
+[
+  {"id": "1", "name": "Sion Luminous", "spirit_modifier": 4, "default_level": 4, "default_element": "fire"},
+  {"id": "2", "name": "Xaioli", "spirit_modifier": 4, "default_level": 4, "default_element": "wood"},
+  {"id": "3", "name": "Garris", "spirit_modifier": 4, "default_level": 4, "default_element": "metal"},
+  {"id": "4", "name": "Craig", "spirit_modifier": 3, "default_level": 4, "default_element": "earth"},
+  {"id": "5", "name": "Ying Yue", "spirit_modifier": 4, "default_level": 4, "default_element": "water"},
+  {"id": "6", "name": "Light (DM)", "spirit_modifier": 4, "default_level": 4, "default_element": "fire"}
+]
