@@ -19,6 +19,8 @@ class SpiritAttack:
     proficiency: int
 
     power_dice: int = 0
+    # Max power dice = level x this value (Garris uses 2). Cost is still 1 per die.
+    power_dice_multiplier: int = 1
     distance: int = 0
 
     aoe_shape: str | None = None
@@ -44,7 +46,7 @@ class SpiritAttack:
 
         breakdown = []
 
-        cost, labels = power_cost(self.level, self.power_dice)
+        cost, labels = power_cost(self.level, self.power_dice, self.power_dice_multiplier)
         breakdown.append(("Power", cost, labels))
 
         cost, labels = distance_cost(self.distance)

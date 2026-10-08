@@ -77,10 +77,20 @@ def reusable_mana_pool(proficiency: int) -> int:
     return max(0, int(proficiency))
 
 
-def power_cost(level: int, dice: int) -> tuple[int, list[str]]:
-    level = max(1, int(level))
+def max_power_dice(level: int, multiplier: int = 1) -> int:
+    """Most power dice a character may use (level x multiplier)."""
+    return max(1, int(level)) * max(1, int(multiplier))
+
+
+def power_cost(level: int, dice: int, multiplier: int = 1) -> tuple[int, list[str]]:
+    """Power costs 1 point per d6. Some characters (e.g. Garris) may use up to
+    level x 2 dice, but the cost is still 1 point per die."""
     dice = max(0, int(dice))
-    if dice > level:
+    if dice > max_power_dice(level, multiplier):
+        if int(multiplier) > 1:
+            raise ValueError(
+                f"Power dice cannot exceed {int(multiplier)}x character level."
+            )
         raise ValueError("Power dice cannot exceed character level.")
     return dice, ([f"{dice}d6 Power"] if dice else [])
 

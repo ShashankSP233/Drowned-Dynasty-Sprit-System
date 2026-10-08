@@ -39,9 +39,14 @@ function populateAoeSizes() {
 
 function clampPowerToLevel() {
   const level = Math.max(1, Number($("level").value) || 1);
-  $("power").max = level;
-  if (Number($("power").value) > level) $("power").value = level;
+  const multiplier = Math.max(1, Number(window.selectedCharacterProfile()?.power_dice_multiplier) || 1);
+  const maxDice = level * multiplier;
+  $("power").max = maxDice;
+  if (Number($("power").value) > maxDice) $("power").value = maxDice;
   $("power-value").textContent = `${$("power").value}d6`;
+  $("power-note").textContent = multiplier > 1
+    ? `1 point per 1d6. Maximum dice = ${multiplier}x character level (${maxDice}d6 at level ${level}).`
+    : "1 point per 1d6. Maximum dice = character level.";
 }
 
 function collectAttack() {
@@ -388,6 +393,7 @@ def calculate_attack_js(data_json):
         level=data["level"],
         proficiency=data["proficiency"],
         power_dice=data["power_dice"],
+        power_dice_multiplier=character.get("power_dice_multiplier", 1),
         distance=data["distance"],
         aoe_shape=data["aoe_shape"],
         aoe_size=data["aoe_size"],
