@@ -83,15 +83,18 @@ function selectedRiders() {
   return [...document.querySelectorAll(".rider:checked")].map((input) => input.value);
 }
 
+function powerMultiplier() {
+  return Math.max(1, Number(window.selectedCharacterProfile()?.power_dice_multiplier) || 1);
+}
+
 function maxEmbuePower() {
-  const multiplier = Math.max(1, Number(window.selectedCharacterProfile()?.power_dice_multiplier) || 1);
-  return resources.proficiency * multiplier;
+  return resources.proficiency * powerMultiplier();
 }
 
 function selection() {
   const maxCharges = Math.max(0, resources.level - heldCharges());
   const charges = Math.max(1, Math.min(maxCharges, Number($("charges").value) || 1));
-  const powerDice = Math.min(maxEmbuePower(),  Math.max(0, Number($("power").value) || 0));
+  const powerDice = Math.min(maxEmbuePower(), Math.max(0, Number($("power").value) || 0));
   const riders = selectedRiders();
   const riderCost = riders.reduce((sum, key) => sum + riderEffects[key].cost, 0);
   return {
@@ -238,6 +241,10 @@ async function copyEmbueMacro(textarea) {
 function render() {
   $("power").max = maxEmbuePower();
   $("power-value").textContent = `${$("power").value}d6`;
+  const multiplier = powerMultiplier();
+  $("power-note").textContent = multiplier > 1
+    ? `1 point per d6. Maximum bonus Power is ${multiplier}x proficiency (${maxEmbuePower()}d6).`
+    : "1 point per d6. Maximum bonus Power equals proficiency.";
   renderCost();
   renderBatches();
 }
