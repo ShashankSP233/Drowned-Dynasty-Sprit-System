@@ -83,10 +83,15 @@ function selectedRiders() {
   return [...document.querySelectorAll(".rider:checked")].map((input) => input.value);
 }
 
+function maxEmbuePower() {
+  const multiplier = Math.max(1, Number(window.selectedCharacterProfile()?.power_dice_multiplier) || 1);
+  return resources.proficiency * multiplier;
+}
+
 function selection() {
   const maxCharges = Math.max(0, resources.level - heldCharges());
   const charges = Math.max(1, Math.min(maxCharges, Number($("charges").value) || 1));
-  const powerDice = Math.min(resources.proficiency, Math.max(0, Number($("power").value) || 0));
+  const powerDice = Math.min(maxEmbuePower(),  Math.max(0, Number($("power").value) || 0));
   const riders = selectedRiders();
   const riderCost = riders.reduce((sum, key) => sum + riderEffects[key].cost, 0);
   return {
@@ -231,7 +236,7 @@ async function copyEmbueMacro(textarea) {
 }
 
 function render() {
-  $("power").max = resources.proficiency;
+  $("power").max = maxEmbuePower();
   $("power-value").textContent = `${$("power").value}d6`;
   renderCost();
   renderBatches();
@@ -304,7 +309,7 @@ function longRest() {
 function init() {
   resources = readResources();
   batches = readBatches();
-  $("power").max = resources.proficiency;
+  $("power").max = maxEmbuePower();
   $("power").addEventListener("input", renderCost);
   $("charges").addEventListener("input", renderCost);
   $("embue-form").addEventListener("change", renderCost);
