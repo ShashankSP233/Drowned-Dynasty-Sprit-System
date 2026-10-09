@@ -3,6 +3,6 @@
   {"id": "2", "name": "Xaioli", "spirit_modifier": 4, "default_level": 4, "default_element": "wood", "power_dice_multiplier": 1},
   {"id": "3", "name": "Garras", "spirit_modifier": 5, "default_level": 4, "default_element": "metal", "power_dice_multiplier": 2},
   {"id": "4", "name": "Craig", "spirit_modifier": 3, "default_level": 4, "default_element": "earth", "power_dice_multiplier": 1},
-  {"id": "5", "name": "Ying Yue", "spirit_modifier": 4, "default_level": 4, "default_element": "water", "power_dice_multiplier": 1},
+  {"id": "5", "name": "Cao Yingyue", "spirit_modifier": 3, "default_level": 4, "default_element": "water", "power_dice_multiplier": 1},
   {"id": "6", "name": "Light (DM)", "spirit_modifier": 4, "default_level": 4, "default_element": "fire", "power_dice_multiplier": 1}
 ]
