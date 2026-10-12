@@ -69,6 +69,22 @@ RIDERS = {
 }
 
 
+# Which saving throw (if any) each rider forces.
+RIDER_SAVES = {
+    "dexterity_prone": "Dexterity",
+    "strength_prone_knockback": "Strength",
+    "constitution_blind": "Constitution",
+    "strength_restrained": "Strength",
+    "constitution_incapacitate": "Constitution",
+    "difficult_terrain": None,
+}
+
+
+def proficiency_for_level(level: int) -> int:
+    level = max(1, int(level))
+    return level // 4 + (1 if level % 4 else 0) + 1
+
+
 def spirit_mana_pool(level: int) -> int:
     return max(1, int(level)) * 3
 
@@ -93,6 +109,11 @@ def power_cost(level: int, dice: int, multiplier: int = 1) -> tuple[int, list[st
             )
         raise ValueError("Power dice cannot exceed character level.")
     return dice, ([f"{dice}d6 Power"] if dice else [])
+
+
+def max_embue_power(proficiency: int, multiplier: int = 1) -> int:
+    """Most bonus Power dice one Embue batch may carry (proficiency x multiplier)."""
+    return max(0, int(proficiency)) * max(1, int(multiplier))
 
 
 def distance_cost(distance: int) -> tuple[int, list[str]]:

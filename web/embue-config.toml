@@ -1,0 +1,10 @@
+# Python files the Embue page needs. The ?v= number is a cache-buster:
+# raise it whenever you change one of these files.
+[files]
+"./backend/__init__.py?v=8" = "./backend/__init__.py"
+"./backend/rules.py?v=8" = "./backend/rules.py"
+"./backend/player.py?v=8" = "./backend/player.py"
+"./backend/embue.py?v=8" = "./backend/embue.py"
+"./backend/characters.py?v=8" = "./backend/characters.py"
+"./backend/characters.json?v=8" = "./backend/characters.json"
+"./character_switcher.py?v=8" = "./character_switcher.py"

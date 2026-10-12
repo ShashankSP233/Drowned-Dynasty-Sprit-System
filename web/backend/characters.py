@@ -1,7 +1,7 @@
 """Character profiles used by the Spirit Attack Builder.
 
 The profile data lives in characters.json so the Python rules engine
-(Attack Builder) and the plain-JavaScript Embue page read the same source.
+and both Python pages read the same source.
 Edit each profile's name, Spirit modifier, level and element in that file.
 """
 

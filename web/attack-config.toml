@@ -1,0 +1,11 @@
+# Python files the Attack Builder page needs. The ?v= number is a cache-buster:
+# raise it whenever you change one of these files.
+[files]
+"./backend/__init__.py?v=8" = "./backend/__init__.py"
+"./backend/rules.py?v=8" = "./backend/rules.py"
+"./backend/attack.py?v=8" = "./backend/attack.py"
+"./backend/player.py?v=8" = "./backend/player.py"
+"./backend/builder.py?v=8" = "./backend/builder.py"
+"./backend/characters.py?v=8" = "./backend/characters.py"
+"./backend/characters.json?v=8" = "./backend/characters.json"
+"./character_switcher.py?v=8" = "./character_switcher.py"

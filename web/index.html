@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Spirit Attack Builder</title>
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
   <main class="app">
@@ -159,7 +159,7 @@
     </section>
 
     <footer>
-      <span>Python rules engine + Pyodide</span>
+      <span>Python rules engine + PyScript</span>
       <span>Designed for GitHub Pages</span>
     </footer>
   </main>
@@ -177,8 +177,8 @@
       </div>
     </section>
   </div>
-  <script src="https://cdn.jsdelivr.net/pyodide/v0.27.2/full/pyodide.js"></script>
-  <script src="character-picker.js?v=6"></script>
-  <script src="app.js?v=6"></script>
+  <link rel="stylesheet" href="https://pyscript.net/releases/2026.7.3/core.css">
+  <script type="module" src="https://pyscript.net/releases/2026.7.3/core.js"></script>
+  <script type="py" src="attack_page.py?v=8" config="attack-config.toml?v=8"></script>
 </body>
 </html>
